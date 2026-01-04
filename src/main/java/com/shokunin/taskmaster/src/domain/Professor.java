@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 
 @ToString(exclude = "instituicoes")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
