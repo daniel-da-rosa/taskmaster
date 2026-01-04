@@ -1,4 +1,4 @@
-package com.shokunin.taskmaster.src.repository;
+package com.shokunin.taskmaster.src.infrastructure.persistence;
 
 import com.shokunin.taskmaster.src.domain.Cidade;
 import org.springframework.data.jpa.repository.JpaRepository;

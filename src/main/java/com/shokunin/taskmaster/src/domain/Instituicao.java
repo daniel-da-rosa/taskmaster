@@ -36,4 +36,8 @@ public class Instituicao {
     @ManyToOne
     @JoinColumn(name = "cidade_id")
     private Cidade cidade;
+
+    @ManyToOne
+    @JoinColumn(name="professor")
+    private Professor professor;
 }

@@ -2,7 +2,7 @@ package com.shokunin.taskmaster.src.config;
 
 import com.shokunin.taskmaster.src.domain.Cidade;
 import com.shokunin.taskmaster.src.domain.UF;
-import com.shokunin.taskmaster.src.repository.CidadeRepository;
+import com.shokunin.taskmaster.src.infrastructure.persistence.CidadeRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
