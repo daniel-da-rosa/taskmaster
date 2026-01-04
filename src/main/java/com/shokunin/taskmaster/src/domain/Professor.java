@@ -3,20 +3,23 @@ package com.shokunin.taskmaster.src.domain;
 import com.shokunin.taskmaster.src.domain.types.Cpf;
 import com.shokunin.taskmaster.src.domain.types.Email;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter @Setter
+
+@ToString(exclude = "instituicoes")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+
 @NoArgsConstructor
 @AllArgsConstructor
 public class Professor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false)
