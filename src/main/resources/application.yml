@@ -2,9 +2,9 @@ spring:
   application:
     name: taskmaster
   datasource:
-    url: jdbc:postgresql://db.logvonbnbwoffadgckkt.supabase.co:5432/postgres
-    username: postgres
-    password: "OSCdrdfmc100$" # Mantenha as aspas duplas se tiver caracteres especiais
+    url: jdbc:postgresql://localhost:5432/taskmaster
+    username: taskmaster
+    password: taskmaster
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
