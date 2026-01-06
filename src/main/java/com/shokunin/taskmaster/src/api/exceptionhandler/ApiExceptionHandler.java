@@ -1,10 +1,9 @@
 package com.shokunin.taskmaster.src.api.exceptionhandler;
 
 import com.shokunin.taskmaster.src.infrastructure.exception.RegraDeNegocioException;
-import org.mapstruct.Mapper;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
