@@ -1,7 +1,9 @@
 package com.shokunin.taskmaster.src.domain;
 
 import com.shokunin.taskmaster.src.domain.types.Cpf;
+import com.shokunin.taskmaster.src.domain.types.CpfConverter;
 import com.shokunin.taskmaster.src.domain.types.Email;
+import com.shokunin.taskmaster.src.domain.types.EmailConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,10 +28,12 @@ public class Professor {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 14)
+    @Convert(converter = CpfConverter.class)
     private Cpf cpf;
 
     @Column(nullable = false)
+    @Convert(converter = EmailConverter.class)
     private Email email;
 
     @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL,orphanRemoval = true)
