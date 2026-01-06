@@ -4,7 +4,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class ConverteEmail implements AttributeConverter<Email, String> {
+public class EmailConverter implements AttributeConverter<Email, String> {
     @Override
     public String convertToDatabaseColumn(Email email) {
         if(email==null) return null;
