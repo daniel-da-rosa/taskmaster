@@ -3,7 +3,7 @@ package com.shokunin.taskmaster.src.domain;
 
 import com.shokunin.taskmaster.src.domain.types.Cnpj;
 import com.shokunin.taskmaster.src.domain.types.CnpjConverter;
-import com.shokunin.taskmaster.src.domain.types.ConverteEmail;
+import com.shokunin.taskmaster.src.domain.types.EmailConverter;
 import com.shokunin.taskmaster.src.domain.types.Email;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public class Instituicao {
     private Cnpj cnpj;
 
     @Column(length = 100)
-    @Convert(converter = ConverteEmail.class)
+    @Convert(converter = EmailConverter.class)
     private Email email;
 
     private String telefone;

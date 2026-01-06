@@ -8,6 +8,7 @@ import com.shokunin.taskmaster.src.domain.Instituicao;
 import com.shokunin.taskmaster.src.domain.Professor;
 import com.shokunin.taskmaster.src.domain.types.Cnpj;
 import com.shokunin.taskmaster.src.domain.types.Email;
+import com.shokunin.taskmaster.src.infrastructure.exception.RegraDeNegocioException;
 import com.shokunin.taskmaster.src.infrastructure.persistence.CidadeRepository;
 import com.shokunin.taskmaster.src.infrastructure.persistence.InstituicaoRepository;
 import com.shokunin.taskmaster.src.infrastructure.persistence.ProfessorRepository;
@@ -29,12 +30,12 @@ public class InstituicaoService {
     @Transactional
     public Instituicao save(InstituicaoRequestDTO dto, Long professorId){
         if (instituicaoRepository.existsByCnpj(new Cnpj(dto.cnpj()))){
-            throw new IllegalArgumentException("Cnpj já Cadastrado!");
+            throw new RegraDeNegocioException("Cnpj já Cadastrado!");
         }
         Professor dono = professorRepository.findById(professorId)
-                .orElseThrow(()-> new  IllegalArgumentException("Professor não Encontrado"));
+                .orElseThrow(()-> new RegraDeNegocioException("Professor não Encontrado"));
         Cidade cidade = cidadeRepository.findById(new Long(1))//(dto.cidadeId())
-                .orElseThrow(()-> new IllegalArgumentException("Cidade não encontrada."));
+                .orElseThrow(()-> new RegraDeNegocioException("Cidade não encontrada."));
 
         Instituicao nova = new Instituicao();
         nova.setNome(dto.nome());
