@@ -1,11 +1,10 @@
 package com.shokunin.taskmaster.src.api.controller;
 
 import com.shokunin.taskmaster.src.api.dto.ProfessorDTO;
-import com.shokunin.taskmaster.src.domain.Professor;
-import com.shokunin.taskmaster.src.domain.types.Cpf;
-import com.shokunin.taskmaster.src.domain.types.Email;
-import com.shokunin.taskmaster.src.infrastructure.persistence.ProfessorRepository;
+import com.shokunin.taskmaster.src.api.dto.response.ProfessorResponseDTO;
+import com.shokunin.taskmaster.src.api.mapper.ProfessorMapper;
 import com.shokunin.taskmaster.src.service.ProfessorService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,26 +15,21 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/api/professores")
+@RequiredArgsConstructor
 public class ProfessorController {
 
     private final ProfessorService service;
-
-    public ProfessorController(ProfessorService service){
-        this.service = service;
-    }
+    private final ProfessorMapper mapper;
 
     @PostMapping
-    public ResponseEntity<Professor> criar(@RequestBody ProfessorDTO dto){
-        Professor professor = new Professor();
-        professor.setNome(dto.nome());
-        professor.setEmail(new Email(dto.email()));
-        professor.setCpf(new Cpf(dto.cpf()));
-        
-        var salvo = service.save(professor);
+    public ResponseEntity<ProfessorResponseDTO> criar(
+            @RequestBody ProfessorDTO dto){
+        var salvo = service.save(dto);
+        var response = mapper.toDTO(salvo);
 
         return ResponseEntity
-                .created(URI.create("/api/professores/"+salvo.getId()))
-                .body(salvo);
+                .created(URI.create("/api/professores/"+response.id()))
+                .body(response);
 
     }
 }
