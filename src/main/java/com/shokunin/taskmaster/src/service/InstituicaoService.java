@@ -34,7 +34,7 @@ public class InstituicaoService {
         }
         Professor dono = professorRepository.findById(professorId)
                 .orElseThrow(()-> new RegraDeNegocioException("Professor não Encontrado"));
-        Cidade cidade = cidadeRepository.findById(new Long(1))//(dto.cidadeId())
+        Cidade cidade = cidadeRepository.findById(dto.cidadeId())
                 .orElseThrow(()-> new RegraDeNegocioException("Cidade não encontrada."));
 
         Instituicao nova = new Instituicao();
