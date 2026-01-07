@@ -10,6 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -40,4 +43,12 @@ public class Instituicao {
     @ManyToOne
     @JoinColumn(name="professor")
     private Professor professor;
+
+    @OneToMany(mappedBy = "instituicao", cascade = CascadeType.ALL,orphanRemoval = true)
+    List<Turma> turmas = new ArrayList<>();
+
+    public void adicionarTurmas(Turma turma){
+        turmas.add(turma);
+        turma.setInstituicao(this);
+    }
 }
