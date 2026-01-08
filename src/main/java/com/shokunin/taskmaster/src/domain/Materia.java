@@ -2,22 +2,24 @@ package com.shokunin.taskmaster.src.domain;
 
 import com.shokunin.taskmaster.src.domain.enums.NivelEnsino;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 
-@Table(name="materia",uniqueConstraints = {
-        @UniqueConstraint(name = "uk_materia_nivel",columnNames = {"nome","nivel"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
+@Table(name="materia", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_materia_nivel", columnNames = {"nome", "nivel"})
 })
 public class Materia {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private long id;
 
     @Column(nullable = false)
@@ -27,6 +29,6 @@ public class Materia {
     private String ementa;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "nivel", nullable = false)
     private NivelEnsino nivelEnsino;
 }
