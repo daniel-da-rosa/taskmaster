@@ -13,7 +13,7 @@ import lombok.*;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 @Table(name="materia", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_materia_nivel", columnNames = {"nome", "nivel"})
+        @UniqueConstraint(name = "uk_materia_nivel", columnNames = {"nome", "nivel_ensino"})
 })
 public class Materia {
 
@@ -29,6 +29,6 @@ public class Materia {
     private String ementa;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "nivel", nullable = false)
+    @Column(name = "nivel_ensino", nullable = false)
     private NivelEnsino nivelEnsino;
 }
