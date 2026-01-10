@@ -16,4 +16,5 @@ public interface QuestaoRepository extends JpaRepository<Questao, Long> {
     Optional<Questao> findByIdWithAlternativas(@Param("id") Long id);
 
     boolean existsByEnunciadoAndMateriaId(String enunciado, Long materiaId);
+    boolean existsByEnunciadoAndMateriaIdAndIdNot(String enunciado, Long materiaId, Long id);
 }

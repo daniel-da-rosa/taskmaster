@@ -12,8 +12,10 @@ import com.shokunin.taskmaster.src.infrastructure.exception.RegraDeNegocioExcept
 import com.shokunin.taskmaster.src.infrastructure.persistence.CidadeRepository;
 import com.shokunin.taskmaster.src.infrastructure.persistence.InstituicaoRepository;
 import com.shokunin.taskmaster.src.infrastructure.persistence.ProfessorRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,25 +31,22 @@ public class InstituicaoService {
 
     @Transactional
     public Instituicao save(InstituicaoRequestDTO dto, Long professorId){
+
         if (instituicaoRepository.existsByCnpj(new Cnpj(dto.cnpj()))){
-            throw new RegraDeNegocioException("Cnpj já Cadastrado!");
+            throw new RegraDeNegocioException("Já existe uma instituição cadastrada com este CNPJ.");
         }
         Professor dono = professorRepository.findById(professorId)
-                .orElseThrow(()-> new RegraDeNegocioException("Professor não Encontrado"));
+                .orElseThrow(()-> new RegraDeNegocioException("Professor não encontrado com id: " + professorId));
         Cidade cidade = cidadeRepository.findById(dto.cidadeId())
-                .orElseThrow(()-> new RegraDeNegocioException("Cidade não encontrada."));
+                .orElseThrow(()-> new RegraDeNegocioException("Cidade não encontrada com id: " + dto.cidadeId()));
 
-        Instituicao nova = new Instituicao();
-        nova.setNome(dto.nome());
-        nova.setEndereco(dto.endereco());
-        nova.setTelefone(dto.telefone());
-        nova.setEmail(new Email(dto.email()));//cria e seta o valueObject
-        nova.setCnpj(new Cnpj(dto.cnpj()));
+        var novaInstituicao = mapper.toEntity(dto);
+
         //vincula
-        nova.setProfessor(dono);
-        nova.setCidade(cidade);
+        novaInstituicao.setProfessor(dono);
+        novaInstituicao.setCidade(cidade);
 
-        return instituicaoRepository.save(nova);
+        return instituicaoRepository.save(novaInstituicao);
     }
 
     public List<InstituicaoResponseDTO> listaPorProfessor(Long professorId){
@@ -57,6 +56,52 @@ public class InstituicaoService {
         return instituicoes.stream()
                 .map(mapper::toDTO)
                 .toList();
+    }
+    // --- READ (Busca Individual) ---
+    public InstituicaoResponseDTO buscarPorId(Long id) {
+        return instituicaoRepository.findById(id)
+                .map(mapper::toDTO)
+                .orElseThrow(() -> new EntityNotFoundException("Instituição não encontrada com id: " + id));
+    }
+
+    // --- UPDATE ---
+    @Transactional
+    public InstituicaoResponseDTO atualizar(Long id, InstituicaoRequestDTO dto) {
+        var instituicao = instituicaoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Instituição não encontrada com id: " + id));
+
+        // 1. Validação de Duplicidade (CNPJ)
+        if (instituicaoRepository.existsByCnpjAndIdNot(new Cnpj(dto.cnpj()), id)) {
+            throw new RegraDeNegocioException("Este CNPJ já está sendo usado por outra instituição.");
+        }
+
+        // 2. Validação da Cidade (Se mudou o ID no JSON, buscamos a nova)
+        var cidade = cidadeRepository.findById(dto.cidadeId())
+                .orElseThrow(() -> new EntityNotFoundException("Cidade não encontrada com id: " + dto.cidadeId()));
+
+        // 3. Atualização
+        mapper.updateEntityFromDto(dto, instituicao);
+        instituicao.setCidade(cidade); // Atualiza o relacionamento manualmente
+
+        return mapper.toDTO(instituicaoRepository.save(instituicao));
+    }
+
+    // --- DELETE ---
+    @Transactional
+    public InstituicaoResponseDTO excluir(Long id) {
+        var instituicao = instituicaoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Instituição não encontrada com id: " + id));
+
+        var dto = mapper.toDTO(instituicao);
+
+        try {
+            instituicaoRepository.delete(instituicao);
+            instituicaoRepository.flush(); // Força validação de FK (Ex: Turmas vinculadas)
+        } catch (DataIntegrityViolationException e) {
+            throw new RegraDeNegocioException("Não é possível excluir a instituição pois ela possui turmas ou registros vinculados.");
+        }
+
+        return dto;
     }
 
 }

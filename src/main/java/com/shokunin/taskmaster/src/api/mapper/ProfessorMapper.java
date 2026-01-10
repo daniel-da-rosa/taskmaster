@@ -7,16 +7,15 @@ import com.shokunin.taskmaster.src.domain.types.Cpf;
 import com.shokunin.taskmaster.src.domain.types.Email;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface ProfessorMapper {
 
-    @Mapping(target = "email", source ="email")
     ProfessorResponseDTO toDTO(Professor professor);
 
     @Mapping(target = "id",ignore = true)
     @Mapping(target = "instituicoes", ignore = true)
-
     Professor toEntity(ProfessorDTO dto);
 
     default Cpf mapCpf(String cpf){
@@ -34,4 +33,8 @@ public interface ProfessorMapper {
     default String map(Cpf cpf){
         return cpf==null? null : cpf.toString();
     }
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "instituicoes", ignore = true)
+    void updateEntityFromDto(ProfessorDTO dto, @MappingTarget Professor entity);
 }

@@ -15,4 +15,6 @@ public interface ProfessorRepository extends JpaRepository<Professor, Long> {
 
     Optional<Professor> findByCpf(Cpf cpf);
     Optional<Professor> findByEmail(Email email);
+    boolean existsByCpfAndIdNot(Cpf cpf, Long id);
+    boolean existsByEmailAndIdNot(Email email, Long id);
 }

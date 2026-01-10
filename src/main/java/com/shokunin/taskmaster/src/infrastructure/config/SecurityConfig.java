@@ -1,4 +1,4 @@
-package com.shokunin.taskmaster.src.config;
+package com.shokunin.taskmaster.src.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

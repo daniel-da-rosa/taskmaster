@@ -1,4 +1,4 @@
-package com.shokunin.taskmaster.src.config;
+package com.shokunin.taskmaster.src.infrastructure.config;
 
 import com.shokunin.taskmaster.src.domain.Cidade;
 import com.shokunin.taskmaster.src.domain.UF;

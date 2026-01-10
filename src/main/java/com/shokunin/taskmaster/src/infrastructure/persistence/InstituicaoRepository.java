@@ -15,4 +15,5 @@ public interface InstituicaoRepository extends JpaRepository<Instituicao, Long> 
     Optional<Instituicao> findByEmail(Email email);
     List<Instituicao> findByProfessorId(Long professorId);
     boolean existsByCnpj(Cnpj cnpj);
+    boolean existsByCnpjAndIdNot(Cnpj cnpj, Long id);
 }

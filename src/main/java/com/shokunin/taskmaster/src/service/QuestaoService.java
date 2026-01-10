@@ -10,8 +10,10 @@ import com.shokunin.taskmaster.src.domain.Questao;
 import com.shokunin.taskmaster.src.infrastructure.exception.RegraDeNegocioException;
 import com.shokunin.taskmaster.src.infrastructure.persistence.MateriaRepository;
 import com.shokunin.taskmaster.src.infrastructure.persistence.QuestaoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,23 +37,64 @@ public class QuestaoService {
         Materia materia = materiaRepository.findById(materiaId)
                 .orElseThrow(() -> new RegraDeNegocioException("Materia não encontrada"));
 
-        Questao questao = new Questao();
-        questao.setEnunciado(dto.enunciado());
+        var questao = mapper.toEntity(dto);
         questao.setMateria(materia);
+        questao.getAlternativas().forEach(a-> a.setQuestao(questao));
 
-        dto.alternativas().forEach(altDto ->{
-            Alternativa alternativa = new Alternativa();
-            alternativa.setTexto(altDto.texto());
-            alternativa.setCorreta(altDto.correta());
-            questao.addAlternativa(alternativa);
-
-        });
-        repository.save(questao);
         return mapper.toDTO(questao);
 
+    }
 
+    public List<QuestaoResponseDTO> listaPorMateria(Long materiaId){
+        if(!materiaRepository.existsById(materiaId)){
+            throw new EntityNotFoundException("Matéria não encontrada!");
+        }
+        return repository.findByMateriaId(materiaId).stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
+
+    public QuestaoResponseDTO buscarPorId(Long id){
+        return repository.findById(id)
+                .map(mapper::toDTO)
+                .orElseThrow(()->new EntityNotFoundException("Questão não encontrada!"));
 
     }
+
+    //--Update
+    @Transactional
+    public QuestaoResponseDTO atualizar(Long id, QuestaoRequestDTO dto){
+        var questao = repository.findById(id)
+                .orElseThrow(()->new EntityNotFoundException("Questão não encontrada!"));
+
+        validarAlternativas(dto.alternativas());
+
+        if(repository.existsByEnunciadoAndMateriaIdAndIdNot(dto.enunciado(),questao.getMateria().getId(),id)){
+            throw new RegraDeNegocioException("Já existe outra questão com esse enuciado!");
+        }
+        mapper.updateEntityFromDto(dto,questao);
+        questao.getAlternativas().stream()
+                .forEach( q-> q.setQuestao(questao));
+        return mapper.toDTO(repository.save(questao));
+    }
+
+    //--Delete
+    public QuestaoResponseDTO excluir(Long id){
+        var questao = repository.findById(id)
+                .orElseThrow(()-> new EntityNotFoundException("Questão não encontrada!"));
+
+        var dto = mapper.toDTO(questao);
+
+        try{
+            repository.delete(questao);
+            repository.flush();
+        }catch (DataIntegrityViolationException e){
+            throw  new RegraDeNegocioException("Não é possível excluir a questão pois ela já foi respondida ou está em uso.");
+        }
+        return dto;
+    }
+
+    //--Validação
     public void validarAlternativas(List<AlternativaRequestDTO> alternativas){
         long alternativasCorretas = alternativas.stream()
                 .filter(alternativa -> alternativa.correta())
@@ -62,11 +105,5 @@ public class QuestaoService {
 
     }
 
-    public List<QuestaoResponseDTO> listaPorMateria(Long materiaId){
-        return repository.findByMateriaId(materiaId).stream()
-                .map(mapper::toDTO)
-                .toList();
-
-    }
 
 }
