@@ -30,4 +30,4 @@ test_job:
   script:
     - echo "🧪 Rodando testes unitários..."
     - chmod +x mvnw
-    - ./mvnw testes
+    - ./mvnw test
