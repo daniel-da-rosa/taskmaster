@@ -1,0 +1,33 @@
+stages:
+  - build
+  - test
+
+variables:
+  # Otimiza o download das dependências (cache)
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository
+
+# Etapa 1: Compilação e Empacotamento
+build_job:
+  stage: build
+  image: eclipse-temurin:17-jdk-jammy
+  script:
+    - echo "🏗️ Iniciando o Build da Taskmaster Corp..."
+    - chmod +x mvnw
+    - ./mvnw clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 week
+
+# Etapa 2: Testes Unitários (Só roda se o build passar)
+test_job:
+  stage: test
+  image: eclipse-temurin:17-jdk-jammy
+  script:
+    - echo "🧪 Rodando testes unitários..."
+    - chmod +x mvnw
+    - ./mvnw test
