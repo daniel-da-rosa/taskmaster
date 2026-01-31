@@ -1,33 +1,19 @@
-stages:
-  - build
-  - test
-
-variables:
-  # Otimiza o download das dependências (cache)
-  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-
-cache:
-  paths:
-    - .m2/repository
-
-# Etapa 1: Compilação e Empacotamento
-build_job:
-  stage: build
-  image: eclipse-temurin:17-jdk-jammy
-  script:
-    - echo "🏗️ Iniciando o Build da Taskmaster Corp..."
-    - chmod +x mvnw
-    - ./mvnw clean package -DskipTests
-  artifacts:
-    paths:
-      - target/*.jar
-    expire_in: 1 week
-
-# Etapa 2: Testes Unitários (Só roda se o build passar)
 test_job:
   stage: test
   image: eclipse-temurin:17-jdk-jammy
+  services:
+    - name: postgres:15-alpine
+      alias: db-server  # O Spring vai conectar neste hostname
+  variables:
+    # Configurações que o container do Postgres vai usar ao subir
+    POSTGRES_DB: taskmaster_test
+    POSTGRES_USER: admin
+    POSTGRES_PASSWORD: password
+    # Configurações que o Spring Boot vai usar para achar o banco no pipeline
+    SPRING_DATASOURCE_URL: jdbc:postgresql://db-server:5432/taskmaster_test
+    SPRING_DATASOURCE_USERNAME: admin
+    SPRING_DATASOURCE_PASSWORD: password
+    SPRING_JPA_HIBERNATE_DDL_AUTO: update
   script:
-    - echo "🧪 Rodando testes unitários..."
     - chmod +x mvnw
     - ./mvnw test
