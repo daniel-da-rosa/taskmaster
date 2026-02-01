@@ -41,7 +41,8 @@ public class QuestaoService {
         questao.setMateria(materia);
         questao.getAlternativas().forEach(a-> a.setQuestao(questao));
 
-        return mapper.toDTO(questao);
+        var questaoSalva = repository.save(questao);
+        return mapper.toDTO(questaoSalva);
 
     }
 
