@@ -28,11 +28,11 @@ public class Professor {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false, length = 14)
-    @Convert(converter = CpfConverter.class)
+    @Column(name = "cpf", nullable = false, length = 14, unique = true)
+    @Convert(converter = CpfConverter.class )
     private Cpf cpf;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true,name = "email")
     @Convert(converter = EmailConverter.class)
     private Email email;
 
