@@ -21,6 +21,7 @@ public class Questao {
     private Long id;
 
     @NotBlank(message = "O enunciado da questão é obrigatório")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String enunciado;
 
     @ManyToOne(fetch = FetchType.LAZY)
