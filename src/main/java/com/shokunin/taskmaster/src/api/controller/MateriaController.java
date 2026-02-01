@@ -1,6 +1,5 @@
 package com.shokunin.taskmaster.src.api.controller;
 
-
 import com.shokunin.taskmaster.src.api.dto.MateriaRequestDTO;
 import com.shokunin.taskmaster.src.api.dto.response.MateriaResponseDTO;
 import com.shokunin.taskmaster.src.api.mapper.MateriaMapper;
@@ -17,12 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/materias")
+@RequestMapping("/api/materias") // <--- AJUSTADO PARA /api
 @RequiredArgsConstructor
 public class MateriaController {
+
     private final MateriaService service;
     private final MateriaMapper mapper;
 
@@ -38,16 +36,21 @@ public class MateriaController {
 
         var materia = service.save(dto);
         var responseDTO = mapper.toDTO(materia);
-        var uri = uriBuilder.path("/materias/{id}")
+
+        // Ajustado para refletir a rota /api
+        var uri = uriBuilder.path("/api/materias/{id}")
                 .buildAndExpand(materia.getId())
                 .toUri();
+
         return ResponseEntity.created(uri).body(responseDTO);
     }
+
     @GetMapping
     public ResponseEntity<Page<MateriaResponseDTO>> listar(
-            @PageableDefault(size = 10,sort = "nome")Pageable pageable
-            ) {
-
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable
+    ) {
+        // Supondo que seu Service já retorne Page<DTO> ou faça o map.
+        // Se o service retornar Page<Entity>, avise que ajustamos aqui.
         return ResponseEntity.ok(service.listar(pageable));
     }
 
@@ -58,11 +61,11 @@ public class MateriaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MateriaResponseDTO>atualizar(
+    public ResponseEntity<MateriaResponseDTO> atualizar(
             @PathVariable Long id,
             @RequestBody @Valid MateriaRequestDTO dto
     ){
-        var responseDTO = service.atualizar(id,dto);
+        var responseDTO = service.atualizar(id, dto);
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -74,9 +77,6 @@ public class MateriaController {
     @DeleteMapping("/{id}")
     public ResponseEntity<MateriaResponseDTO> excluir(@PathVariable Long id){
         var materiaExcluida = service.excluir(id);
-
         return ResponseEntity.ok(materiaExcluida);
     }
-
-
 }

@@ -1,10 +1,9 @@
 package com.shokunin.taskmaster.src.api.controller;
 
+import com.shokunin.taskmaster.src.api.dto.InstituicaoRequestDTO;
 import com.shokunin.taskmaster.src.api.dto.response.InstituicaoResponseDTO;
 import com.shokunin.taskmaster.src.api.mapper.InstituicaoMapper;
-import com.shokunin.taskmaster.src.api.dto.InstituicaoRequestDTO;
 import com.shokunin.taskmaster.src.service.InstituicaoService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -28,18 +26,19 @@ public class InstituicaoController {
     @Operation(summary = "Vincular Instituição", description = "Cria ou vincula uma instituição a um professor.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Instituição vinculada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Professor não encontrado"),
+            @ApiResponse(responseCode = "404", description = "Professor ou Cidade não encontrados"),
             @ApiResponse(responseCode = "422", description = "Erro de validação ou regra de negócio")
     })
-    @PostMapping
+    @PostMapping("/instituicoes") // <--- ROTA CORRIGIDA
     public ResponseEntity<InstituicaoResponseDTO> criar(
-            @PathVariable Long professorId,
-            @RequestBody @Valid InstituicaoRequestDTO dto,
+            @RequestBody @Valid InstituicaoRequestDTO dto, // <--- REMOVIDO @PathVariable (vem no DTO)
             UriComponentsBuilder uriBuilder){
 
-        var instituicaoSalva = instituicaoService.save(dto, professorId);
+        // O ID do professor vem dentro do DTO agora
+        var instituicaoSalva = instituicaoService.save(dto, dto.professorId());
+
         var response = mapper.toDTO(instituicaoSalva);
-        var uri = uriBuilder.path("/api/instituicao/{id}")
+        var uri = uriBuilder.path("/api/instituicoes/{id}")
                 .buildAndExpand(response.id())
                 .toUri();
 
@@ -47,17 +46,12 @@ public class InstituicaoController {
                 .created(uri)
                 .body(response);
     }
-    @Operation(summary = "Vincular Instituição", description = "Cria uma instituição vinculada a um professor.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Instituição criada"),
-            @ApiResponse(responseCode = "422", description = "CNPJ duplicado")
-    })
-    @PostMapping("/professores/{professorId}/instituicoes")
+
+    @Operation(summary = "Listar por Professor", description = "Lista instituições de um professor.")
+    @GetMapping("/professores/{professorId}/instituicoes") // <--- MUDADO PARA GET
     public ResponseEntity<List<InstituicaoResponseDTO>> lista(@PathVariable Long professorId) {
         var lista = instituicaoService.listaPorProfessor(professorId);
-
         return ResponseEntity.ok(lista);
-
     }
 
     @Operation(summary = "Buscar Instituição", description = "Busca detalhes de uma instituição pelo ID.")
@@ -67,10 +61,6 @@ public class InstituicaoController {
     }
 
     @Operation(summary = "Atualizar Instituição", description = "Atualiza dados cadastrais da instituição.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Atualizado com sucesso"),
-            @ApiResponse(responseCode = "422", description = "CNPJ duplicado ou erro de integridade")
-    })
     @PutMapping("/instituicoes/{id}")
     public ResponseEntity<InstituicaoResponseDTO> atualizar(
             @PathVariable Long id,
