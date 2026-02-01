@@ -19,7 +19,7 @@ public class Alternativa {
     private long id;
 
     @NotBlank(message = "O texto da alternativa é obrigatório")
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String texto;
 
     @Column(nullable = false)
